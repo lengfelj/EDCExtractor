@@ -55,6 +55,10 @@ EHR-to-EDC-POC/
 └── sample_data/         # Sample documents for testing
 ```
 
+
+https://github.com/user-attachments/assets/8af3c165-964f-4e0c-89ac-e1722867bf5e
+
+
 ## License
 
 This is a proof of concept for demonstration purposes.
