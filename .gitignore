@@ -27,6 +27,9 @@ sample_data/real_*
 outputs/
 logs/
 *.log
+temp_*
+extraction_results.json
+.streamlit/
 
 # OS
 .DS_Store

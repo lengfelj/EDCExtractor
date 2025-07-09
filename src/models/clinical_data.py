@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Union
 from pydantic import BaseModel, Field, validator
 from enum import Enum
 
@@ -33,7 +33,7 @@ class LabResult(BaseModel):
 
 class VitalSign(BaseModel):
     parameter: str = Field(..., description="Vital sign parameter name")
-    value: float = Field(..., description="Measured value")
+    value: Union[str, int, float] = Field(..., description="Measured value (handles various formats)")
     unit: str = Field(..., description="Unit of measurement")
     date_time: Optional[datetime] = Field(None, description="Date/time of measurement")
     position: Optional[str] = Field(None, description="Patient position during measurement")
@@ -53,8 +53,8 @@ class VitalSign(BaseModel):
 
 
 class BloodPressure(BaseModel):
-    systolic: float = Field(..., description="Systolic pressure")
-    diastolic: float = Field(..., description="Diastolic pressure")
+    systolic: Optional[float] = Field(None, description="Systolic pressure")
+    diastolic: Optional[float] = Field(None, description="Diastolic pressure")
     unit: str = Field("mmHg", description="Unit of measurement")
     date_time: Optional[datetime] = Field(None, description="Date/time of measurement")
     position: Optional[str] = Field(None, description="Patient position")

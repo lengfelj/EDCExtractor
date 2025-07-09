@@ -3,7 +3,7 @@ import json
 from typing import Dict, Any, Optional, List
 from openai import OpenAI
 import logging
-from ..models.clinical_data import ClinicalDataExtraction, LabResult, VitalSign, BloodPressure
+from models.clinical_data import ClinicalDataExtraction, LabResult, VitalSign, BloodPressure
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +17,7 @@ class AIExtractor:
             raise ValueError("OpenAI API key not provided")
         
         self.client = OpenAI(api_key=self.api_key)
-        self.model = "gpt-4-vision-preview"
+        self.model = "gpt-4o-mini"  # Use gpt-4o for best quality, gpt-4o-mini for speed/cost
     
     def extract_clinical_data(self, image_base64: str, image_format: str) -> ClinicalDataExtraction:
         """Extract lab results and vital signs from image"""
@@ -122,7 +122,10 @@ class AIExtractor:
         - Extract ALL visible data, not just examples
         - Use confidence scores between 0 and 1 based on clarity
         - If date/time is not visible, set to null
+        - If a field is not present or unclear, omit it entirely from the JSON
+        - Only include fields where you can extract actual values
         - Standardize units (e.g., "beats/min" -> "bpm")
+        - For blood pressure, only include if you can identify systolic/diastolic values
         """
     
     def _parse_ai_response(self, response: str) -> ClinicalDataExtraction:
@@ -140,19 +143,39 @@ class AIExtractor:
                 source_document="ai_extraction"
             )
             
-            # Parse lab results
+            # Parse lab results - skip invalid ones
             for lab_data in data.get("lab_results", []):
-                lab_result = LabResult(**lab_data)
-                extraction.lab_results.append(lab_result)
+                try:
+                    # Skip if missing required fields
+                    if not lab_data.get("test_name") or lab_data.get("value") is None:
+                        continue
+                    lab_result = LabResult(**lab_data)
+                    extraction.lab_results.append(lab_result)
+                except Exception as e:
+                    logger.warning(f"Skipping invalid lab result: {e}")
+                    continue
             
-            # Parse vital signs
+            # Parse vital signs - skip invalid ones
             for vital_data in data.get("vital_signs", []):
-                vital_sign = VitalSign(**vital_data)
-                extraction.vital_signs.append(vital_sign)
+                try:
+                    # Skip if missing required fields
+                    if not vital_data.get("parameter") or vital_data.get("value") is None:
+                        continue
+                    vital_sign = VitalSign(**vital_data)
+                    extraction.vital_signs.append(vital_sign)
+                except Exception as e:
+                    logger.warning(f"Skipping invalid vital sign: {e}")
+                    continue
             
-            # Parse blood pressure
+            # Parse blood pressure - skip if invalid
             if data.get("blood_pressure"):
-                extraction.blood_pressure = BloodPressure(**data["blood_pressure"])
+                try:
+                    bp_data = data["blood_pressure"]
+                    # Only create if we have at least one valid value
+                    if bp_data.get("systolic") is not None or bp_data.get("diastolic") is not None:
+                        extraction.blood_pressure = BloodPressure(**bp_data)
+                except Exception as e:
+                    logger.warning(f"Skipping invalid blood pressure: {e}")
             
             # Calculate overall confidence
             extraction.calculate_overall_confidence()
@@ -162,4 +185,9 @@ class AIExtractor:
         except Exception as e:
             logger.error(f"Failed to parse AI response: {e}")
             logger.debug(f"Response was: {response}")
-            raise
+            
+            # Return empty extraction instead of failing
+            return ClinicalDataExtraction(
+                source_document="ai_extraction_failed",
+                overall_confidence=0.0
+            )

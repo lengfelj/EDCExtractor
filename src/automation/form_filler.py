@@ -2,7 +2,7 @@ from playwright.sync_api import sync_playwright, Page, Browser
 from typing import Dict, Any, Optional, List
 import logging
 import time
-from ..models.clinical_data import ClinicalDataExtraction, LabResult, VitalSign
+from models.clinical_data import ClinicalDataExtraction, LabResult, VitalSign
 
 logger = logging.getLogger(__name__)
 
