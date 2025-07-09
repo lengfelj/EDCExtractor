@@ -1,0 +1,52 @@
+{
+  "default_edc": {
+    "lab_fields": {
+      "glucose": "#lab_glucose_value",
+      "hemoglobin": "#lab_hgb_value",
+      "hematocrit": "#lab_hct_value",
+      "white_blood_cells": "#lab_wbc_value",
+      "platelets": "#lab_plt_value",
+      "sodium": "#lab_na_value",
+      "potassium": "#lab_k_value",
+      "chloride": "#lab_cl_value",
+      "creatinine": "#lab_creat_value",
+      "bun": "#lab_bun_value",
+      "alt": "#lab_alt_value",
+      "ast": "#lab_ast_value"
+    },
+    "vital_fields": {
+      "heart_rate": "#vital_hr",
+      "blood_pressure": "#vital_bp",
+      "temperature": "#vital_temp",
+      "respiratory_rate": "#vital_rr",
+      "oxygen_saturation": "#vital_spo2",
+      "weight": "#vital_weight",
+      "height": "#vital_height"
+    },
+    "blood_pressure_fields": {
+      "systolic": "#bp_sys",
+      "diastolic": "#bp_dia"
+    }
+  },
+  "medidata_rave": {
+    "lab_fields": {
+      "glucose": "input[name='LBGLUC']",
+      "hemoglobin": "input[name='LBHGB']",
+      "white_blood_cells": "input[name='LBWBC']"
+    },
+    "vital_fields": {
+      "heart_rate": "input[name='VSHR']",
+      "temperature": "input[name='VSTEMP']"
+    }
+  },
+  "oracle_inform": {
+    "lab_fields": {
+      "glucose": ".field-glucose input",
+      "hemoglobin": ".field-hgb input"
+    },
+    "vital_fields": {
+      "heart_rate": ".field-hr input",
+      "blood_pressure": ".field-bp input"
+    }
+  }
+}
